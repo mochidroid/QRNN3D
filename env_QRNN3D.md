@@ -91,7 +91,7 @@
 
 5. **Install torchnet and tensorboardX:**
     ```bash
-    pip install torchnet tensorboardX
+    pip install torchnet tensorboardX lmdb
     ```
 
     ---
