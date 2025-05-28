@@ -65,7 +65,7 @@
     ```
     > *After installation, you can verify Caffe's Python bindings with:*
     > ```bash
-    > python -c "import caffe; print("Caffe imported successfully!")"
+    > python -c 'import caffe; print("Caffe imported successfully!")'
     > ```
     > *If you see `Caffe imported successfully!`, Caffe is set up correctly.*
 
