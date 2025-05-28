@@ -32,7 +32,8 @@ if __name__ == '__main__':
     engine = Engine(opt)
 
     
-    mat_dataset = MatDataFromFolder('data/JasperRidge/case8')
+    mat_dataset = MatDataFromFolder('data/JasperRidge/JasperRidge_case8')
+    # mat_dataset = MatDataFromFolder('data/PaviaU120/PaviaU120_case8')
     # mat_dataset = MatDataFromFolder('data/Satellite')
     
     mat_transform = Compose([
@@ -66,5 +67,5 @@ if __name__ == '__main__':
     # print(engine.net)
     
     # engine.test_real(mat_loader, savedir=None)
-    engine.test_develop_ST(mat_loader, savedir='results', verbose=True)
+    engine.test_develop(mat_loader, savedir='results', verbose=True)
 

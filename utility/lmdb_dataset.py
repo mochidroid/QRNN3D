@@ -56,7 +56,7 @@ if __name__ == '__main__':
     # dataset = LMDBDataset('Data/ICVL/ICVL32.db')
     # dataset = LMDBDataset('/home/kaixuan/Dataset/ICVL32_28.db')
     # dataset = LMDBDataset('/home/kaixuan/Dataset/CAVE512_31.db')
-    dataset = LMDBDataset('/home/kaixuan/Dataset/ICVL32_16.db')
+    dataset = LMDBDataset('/data/ICVL32_16.db')
     
     print(len(dataset))
     # data = dataset[3]

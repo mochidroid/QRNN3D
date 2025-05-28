@@ -406,6 +406,92 @@ class Engine(object):
                         savemat(outpath, {'R_hsi': torch2numpy(outputs)})
                         
         return res_arr, input_arr
+    
+
+    # saving result into disk
+    def test_develop_ST(self, test_loader, savedir=None, verbose=True):
+        from scipy.io import savemat
+        from os.path import basename, exists
+
+        def torch2numpy(hsi):
+            if self.net.use_2dconv:
+                R_hsi = hsi.data[0].cpu().numpy().transpose((1,2,0))
+            else:
+                R_hsi = hsi.data[0].cpu().numpy()[0,...].transpose((1,2,0))
+            return R_hsi    
+
+        self.net.eval()
+        test_loss = 0
+        total_psnr = 0
+        dataset = test_loader.dataset.dataset
+
+        res_arr = np.zeros((len(test_loader), 3))
+        input_arr = np.zeros((len(test_loader), 3))
+
+        with torch.no_grad():
+            for batch_idx, (inputs, targets) in enumerate(test_loader):
+                if not self.opt.no_cuda:
+                    inputs, targets = inputs.cuda(), targets.cuda()
+                outputs, loss_data, _ = self.__step(False, inputs, targets)
+                
+                test_loss += loss_data
+                avg_loss = test_loss / (batch_idx+1)
+                
+                res_arr[batch_idx, :] = MSIQA(outputs, targets)
+                input_arr[batch_idx, :] = MSIQA(inputs, targets)
+
+                """Visualization"""
+                # Visualize3D(inputs.data[0].cpu().numpy())
+                # Visualize3D(outputs.data[0].cpu().numpy())
+
+                psnr = res_arr[batch_idx, 0]
+                ssim = res_arr[batch_idx, 1]
+                if verbose:
+                    print(f"[{batch_idx}] MPSNR: {psnr:.2f}, MSSIM: {ssim:.4f}")
+                    # print(batch_idx, psnr, ssim)
+
+                if savedir:
+                    filedir = join(savedir, basename(dataset.filenames[batch_idx]).split('.')[0])  
+                    outpath = join(filedir, '{}.mat'.format(self.opt.arch))
+
+                    if not exists(filedir):
+                        os.mkdir(filedir)
+
+                        # savemat(outpath, {'R_hsi': torch2numpy(outputs)})
+                    savemat(outpath, {
+                        'HSI_clean': torch2numpy(targets),
+                        'HSI_noisy': torch2numpy(inputs),
+                        'HSI_restored': torch2numpy(outputs)
+                        })
+
+                # # === 可視化部分（60バンド目） ===
+                # band_idx = 59  # Python index (60バンド目)
+
+                # input_np = torch2numpy(inputs)
+                # output_np = torch2numpy(outputs)
+                # target_np = torch2numpy(targets)
+
+                # plt.figure(figsize=(12, 4))
+                # plt.subplot(1, 3, 1)
+                # plt.imshow(target_np[:, :, band_idx], cmap='gray')
+                # plt.title('GT (band 60)')
+                # plt.axis('off')
+
+                # plt.subplot(1, 3, 2)
+                # plt.imshow(input_np[:, :, band_idx], cmap='gray')
+                # plt.title('Noisy (band 60)')
+                # plt.axis('off')
+
+                # plt.subplot(1, 3, 3)
+                # plt.imshow(output_np[:, :, band_idx], cmap='gray')
+                # plt.title('Denoised (band 60)')
+                # plt.axis('off')
+
+                # plt.tight_layout()
+                # plt.show()
+                        
+        return res_arr, input_arr
+    
 
     def test_real(self, test_loader, savedir=None):
         """Warning: this code is not compatible with bandwise flag"""
