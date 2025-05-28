@@ -63,15 +63,16 @@
     ```bash
     conda install -c conda-forge caffe
     ```
+    
+    ```bash
+    conda install numpy scipy scikit-image matplotlib tqdm h5py
+    ```
+    
     > *After installation, you can verify Caffe's Python bindings with:*
     > ```bash
     > python -c 'import caffe; print("Caffe imported successfully!")'
     > ```
     > *If you see `Caffe imported successfully!`, Caffe is set up correctly.*
-
-    ```bash
-    conda install numpy scipy scikit-image matplotlib tqdm h5py
-    ```
 
 3. **Clone the QRNN3D repository:**
     ```bash
