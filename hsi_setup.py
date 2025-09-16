@@ -428,6 +428,9 @@ class Engine(object):
         res_arr = np.zeros((len(test_loader), 3))
         input_arr = np.zeros((len(test_loader), 3))
 
+        img_name  = os.path.basename(os.path.dirname(self.opt.dataroot))   # e.g., "JasperRidge"
+        case_name = os.path.basename(self.opt.dataroot)                    # e.g., "Case1"
+
         with torch.no_grad():
             for batch_idx, (inputs, targets) in enumerate(test_loader):
                 if not self.opt.no_cuda:
@@ -451,11 +454,16 @@ class Engine(object):
                     # print(batch_idx, psnr, ssim)
 
                 if savedir:
-                    filedir = join(savedir, basename(dataset.filenames[batch_idx]).split('.')[0])  
-                    outpath = join(filedir, '{}.mat'.format(self.opt.arch))
+                    # filedir = join(savedir, basename(dataset.filenames[batch_idx]).split('.')[0])  
+                    # outpath = join(filedir, '{}.mat'.format(self.opt.arch))
+                    filedir = os.path.join(savedir, img_name)
+                    os.makedirs(filedir, exist_ok=True)
 
                     if not exists(filedir):
                         os.mkdir(filedir)
+                    
+                    outname = f"{self.opt.arch}_{img_name}_{case_name}.mat"
+                    outpath = os.path.join(filedir, outname)
 
                         # savemat(outpath, {'R_hsi': torch2numpy(outputs)})
                     savemat(outpath, {
