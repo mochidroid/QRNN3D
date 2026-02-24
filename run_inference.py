@@ -22,8 +22,8 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description='Run QRNN3D inference')
-    parser.add_argument('--dataset', type=str, default='JasperRidge', help='Dataset name (e.g. JasperRidge, PaviaU)')
-    parser.add_argument('--case', type=str, default='Case1', help='Case folder name (e.g. Case1)')
+    parser.add_argument('--input_path', type=str, default='dataset/normalized/JasperRidge/Case1/data.mat', help='Path to the input data.mat file')
+    parser.add_argument('--output_dir', type=str, default='result/normalized/JasperRidge/Case1', help='Directory to save the restored results')
     parser.add_argument('--checkpoint', type=str, default='checkpoints/qrnn3d/complex/model_epoch_100_159904.pth', help='Path to model checkpoint')
     parser.add_argument('--band', type=int, default=50, help='Band index to extract and save as PNG')
     args = parser.parse_args()
@@ -41,13 +41,12 @@ def main():
     model.eval()
 
     # 2. Load dataset
-    print(f'Loading dataset {args.dataset}/{args.case}...')
-    data_path = f'dataset/normalized/{args.dataset}/{args.case}/data.mat'
-    if not os.path.exists(data_path):
-        print(f"Error: Dataset file not found at {data_path}")
+    print(f'Loading dataset from {args.input_path}...')
+    if not os.path.exists(args.input_path):
+        print(f"Error: Dataset file not found at {args.input_path}")
         return
         
-    mat = sio.loadmat(data_path)
+    mat = sio.loadmat(args.input_path)
     
     noisy_hsi = mat['input'][:]  # (H, W, C)
     gt_hsi = mat['gt'][:]
@@ -89,7 +88,7 @@ def main():
     img_input = (noisy_hsi[:, :, band_idx] * 255).clip(0, 255).astype(np.uint8)
     img_restored = (output_np[:, :, band_idx] * 255).clip(0, 255).astype(np.uint8)
 
-    save_dir = f'result/normalized/{args.dataset}/{args.case}'
+    save_dir = args.output_dir
     os.makedirs(save_dir, exist_ok=True)
     
     # 6. Display images

@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+*.pth
+qrnn3d_env/
+dataset/
+datasets/
+result/
+results/
+runs/
+.git/
+.gitignore
+.gitmodules
+bak/
+*.zip

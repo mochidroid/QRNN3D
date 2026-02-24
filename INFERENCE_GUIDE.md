@@ -28,8 +28,8 @@ source qrnn3d_env/bin/activate
 ## 3. 基本的な実行方法
 
 特に引数を指定しない場合、デフォルトで以下の設定が使用されます。
-- データセット: `JasperRidge`
-- ケース: `Case1`
+- 入力パス: `dataset/normalized/JasperRidge/Case1/data.mat`
+- 出力ディレクトリ: `result/normalized/JasperRidge/Case1`
 - モデルパス: `checkpoints/qrnn3d/complex/model_epoch_100_159904.pth`
 - 保存する画像バンド: `50`
 
@@ -49,16 +49,16 @@ python run_inference.py
 データセット名や出力するバンドなどを変えたい場合は、コマンドライン引数で自由に指定することができます。
 
 **使用できる引数:**
-- `--dataset` : データセット名（例: `PaviaU`, `JasperRidge` など）
-- `--case` : ケース名（例: `Case1`, `Case2` など）
+- `--input_path` : 入力データ (`.mat` ファイル) のパス（例: `dataset/normalized/PaviaU/Case2/data.mat` など）
+- `--output_dir` : 推論結果を保存するディレクトリのパス（例: `result/normalized/PaviaU/Case2` など）
 - `--checkpoint` : 使用する PyTorch のチェックポイントモデルのパス
-- `--band` : PNG 形式で抽出して保存したいバンド（波長）のインデックス（※ 0始まり）
+- `--band` : プレビュー画像として抽出・表示したいバンド（波長）のインデックス（※ 0始まり）
 
 **実行例 1: PaviaU データセットの Case2 に対して実行し、バンド 30 を出力する**
 ```bash
 python run_inference.py \
-    --dataset PaviaU \
-    --case Case2 \
+    --input_path dataset/normalized/PaviaU/Case2/data.mat \
+    --output_dir result/normalized/PaviaU/Case2 \
     --checkpoint checkpoints/qrnn3d/complex/model_epoch_100_159904.pth \
     --band 30
 ```
