@@ -105,7 +105,21 @@ def main():
     os.makedirs(save_dir, exist_ok=True)
     mat_name = f'{args.model_type}_{args.norm}.mat'
     save_path = os.path.join(save_dir, mat_name)
-    sio.savemat(save_path, {'restored': output_np, 'gt': gt_hsi, 'input': noisy_hsi})
+    
+    # MATLABの構造体として保存するために辞書(dict)を使用します
+    params_dict = {
+        'normalized': args.norm,
+        'model_type': args.model_type
+    }
+    
+    # ユーザー指定の変数名で辞書のキーを設定
+    sio.savemat(save_path, {
+        'HSI_restored': output_np, 
+        'hsi_gt': gt_hsi, 
+        'HSI_noisy': noisy_hsi,
+        'params': params_dict,
+        'removed_noise': {'all_noise': noisy_hsi - output_np}
+    })
     print('Saved to:', save_dir)
 
 if __name__ == '__main__':
