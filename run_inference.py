@@ -101,6 +101,8 @@ def main():
 
     # 7. Save MAT
     print('Saving MAT file...')
+    save_dir = args.output_dir
+    os.makedirs(save_dir, exist_ok=True)
     mat_name = f'{args.model_type}_{args.norm}.mat'
     save_path = os.path.join(save_dir, mat_name)
     sio.savemat(save_path, {'restored': output_np, 'gt': gt_hsi, 'input': noisy_hsi})
