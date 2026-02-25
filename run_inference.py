@@ -24,7 +24,8 @@ def main():
     parser = argparse.ArgumentParser(description='Run QRNN3D inference')
     parser.add_argument('--input_path', type=str, default='dataset/normalized/JasperRidge/Case1/data.mat', help='Path to the input data.mat file')
     parser.add_argument('--output_dir', type=str, default='result/normalized/JasperRidge/Case1', help='Directory to save the restored results')
-    parser.add_argument('--checkpoint', type=str, default='checkpoints/qrnn3d/complex/model_epoch_100_159904.pth', help='Path to model checkpoint')
+    parser.add_argument('--model_type', type=str, default='complex', choices=['gauss', 'complex', 'paviaft'], help='Type of model to use')
+    parser.add_argument('--norm', type=str, default='clipped', choices=['minmax', 'clipped', 'raw'], help='Normalization method: minmax (scale 0-1), clipped (clamp 0-1), or raw (none)')
     parser.add_argument('--band', type=int, default=50, help='Band index to extract and save as PNG')
     args = parser.parse_args()
 
@@ -32,9 +33,17 @@ def main():
     print('Using device:', device)
 
     # 1. Load model
-    print('Loading model...')
+    print(f'Loading model ({args.model_type})...')
     model = models.__dict__['qrnn3d']()
-    checkpoint_path = args.checkpoint
+    
+    # Resolve checkpoint path based on model type
+    checkpoint_map = {
+        'gauss': 'checkpoints/qrnn3d/gauss/model_epoch_50_118454.pth',
+        'complex': 'checkpoints/qrnn3d/complex/model_epoch_100_159904.pth',
+        'paviaft': 'checkpoints/qrnn3d/paviaft/model_epoch_150_160454.pth'
+    }
+    checkpoint_path = checkpoint_map[args.model_type]
+    
     checkpoint = torch.load(checkpoint_path, map_location=device)
     model.load_state_dict(checkpoint['net'])
     model = model.to(device)
@@ -59,6 +68,19 @@ def main():
     # Construct tensor (B, 1, C, H, W) where B=1
     input_tensor = torch.from_numpy(noisy_hsi_chw[None, None, ...]).float().to(device)
     gt_tensor = torch.from_numpy(gt_hsi_chw[None, None, ...]).float().to(device)
+    
+    # Apply normalization ONLY to input_tensor, GT remains untouched for evaluation
+    print(f'Applying {args.norm} normalization to input...')
+    if args.norm == 'minmax':
+        # min-max scaling to 0-1
+        t_min, t_max = input_tensor.min(), input_tensor.max()
+        if t_max > t_min:
+            input_tensor = (input_tensor - t_min) / (t_max - t_min)
+    elif args.norm == 'clipped':
+        # 0以下を0、1以上を1
+        input_tensor = torch.clamp(input_tensor, 0.0, 1.0)
+    elif args.norm == 'raw':
+        pass
     
     # 3. Test
     print('Running inference...')
@@ -109,14 +131,16 @@ def main():
     axes[2].axis('off')
     
     plt.tight_layout()
-    plot_save_path = os.path.join(save_dir, f'comparison_band{band_idx}.png')
+    plot_name = f'{args.model_type}_{args.norm}_band{band_idx}.png'
+    plot_save_path = os.path.join(save_dir, plot_name)
     plt.savefig(plot_save_path)
     print(f'Saved preview image to: {plot_save_path}')
     plt.close()
 
     # 7. Save MAT
     print('Saving MAT file...')
-    save_path = os.path.join(save_dir, 'restored.mat')
+    mat_name = f'{args.model_type}_{args.norm}.mat'
+    save_path = os.path.join(save_dir, mat_name)
     sio.savemat(save_path, {'restored': output_np, 'gt': gt_hsi, 'input': noisy_hsi})
     print('Saved to:', save_dir)
 
