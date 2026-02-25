@@ -26,7 +26,6 @@ def main():
     parser.add_argument('--output_dir', type=str, default='result/normalized/JasperRidge/Case1', help='Directory to save the restored results')
     parser.add_argument('--model_type', type=str, default='complex', choices=['gauss', 'complex', 'paviaft'], help='Type of model to use')
     parser.add_argument('--norm', type=str, default='clipped', choices=['minmax', 'clipped', 'raw'], help='Normalization method: minmax (scale 0-1), clipped (clamp 0-1), or raw (none)')
-    parser.add_argument('--band', type=int, default=50, help='Band index to extract and save as PNG')
     args = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -98,44 +97,7 @@ def main():
     # output_tensor is (1, 1, C, H, W) or (1, C, H, W)
     output_np = output_tensor.data[0].cpu().numpy()[0, ...].transpose((1, 2, 0))
 
-    # 5. Extract a single band as an image
-    band_idx = args.band
-    if band_idx >= noisy_hsi.shape[2]:
-        print(f"Warning: requested band {band_idx} is out of bounds (max {noisy_hsi.shape[2]-1}). Defaulting to 0.")
-        band_idx = 0
-        
-    print(f'Displaying images for band {band_idx}...')
-    
-    img_gt = (gt_hsi[:, :, band_idx] * 255).clip(0, 255).astype(np.uint8)
-    img_input = (noisy_hsi[:, :, band_idx] * 255).clip(0, 255).astype(np.uint8)
-    img_restored = (output_np[:, :, band_idx] * 255).clip(0, 255).astype(np.uint8)
 
-    save_dir = args.output_dir
-    os.makedirs(save_dir, exist_ok=True)
-    
-    # 6. Display images
-    import matplotlib.pyplot as plt
-    
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    
-    axes[0].imshow(img_input, cmap='gray')
-    axes[0].set_title(f'Noisy Input (Band {band_idx})')
-    axes[0].axis('off')
-    
-    axes[1].imshow(img_restored, cmap='gray')
-    axes[1].set_title(f'Restored Output (Band {band_idx})')
-    axes[1].axis('off')
-
-    axes[2].imshow(img_gt, cmap='gray')
-    axes[2].set_title(f'Ground Truth (Band {band_idx})')
-    axes[2].axis('off')
-    
-    plt.tight_layout()
-    plot_name = f'{args.model_type}_{args.norm}_band{band_idx}.png'
-    plot_save_path = os.path.join(save_dir, plot_name)
-    plt.savefig(plot_save_path)
-    print(f'Saved preview image to: {plot_save_path}')
-    plt.close()
 
     # 7. Save MAT
     print('Saving MAT file...')
