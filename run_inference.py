@@ -108,7 +108,7 @@ def main():
     
     # MATLABの構造体として保存するために辞書(dict)を使用します
     params_dict = {
-        'normalized': args.norm,
+        'norma': args.norm,
         'model_type': args.model_type
     }
     
@@ -118,7 +118,6 @@ def main():
         'hsi_gt': gt_hsi, 
         'HSI_noisy': noisy_hsi,
         'params': params_dict,
-        'removed_noise': {'all_noise': noisy_hsi - output_np}
     })
     print('Saved to:', save_dir)
 
