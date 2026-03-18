@@ -4,6 +4,7 @@ import torch
 import scipy.io as sio
 import numpy as np
 import cv2
+import time
 
 # Add local modules
 import sys
@@ -21,6 +22,7 @@ MSIQA = indexes.MSIQA
 import argparse
 
 def main():
+    start_time = time.time()
     parser = argparse.ArgumentParser(description='Run QRNN3D inference')
     parser.add_argument('--input_path', type=str, default='dataset/JasperRidge/Case1/data.mat', help='Path to the input data.mat file')
     parser.add_argument('--output_dir', type=str, default='result/JasperRidge/Case1', help='Directory to save the restored results')
@@ -107,9 +109,17 @@ def main():
     save_path = os.path.join(save_dir, mat_name)
     
     # MATLABの構造体として保存するために辞書(dict)を使用します
+    end_time = time.time()
+    running_time = end_time - start_time
+    print(f'Total execution time: {running_time:.4f} seconds')
+
     params_dict = {
         'norma': args.norm,
         'model_type': args.model_type
+    }
+    
+    other_result = {
+        'running_time': running_time
     }
     
     # ユーザー指定の変数名で辞書のキーを設定
@@ -118,6 +128,7 @@ def main():
         'hsi_gt': gt_hsi, 
         'HSI_noisy': noisy_hsi,
         'params': params_dict,
+        'other_result': other_result,
     })
     print('Saved to:', save_dir)
 
