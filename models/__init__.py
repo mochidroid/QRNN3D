@@ -1,8 +1,8 @@
-from .memnet import MemNet
+# from .memnet import MemNet
 from .qrnn import REDC3D
 from .qrnn import QRNNREDC3D
 from .qrnn import ResQRNN3D
-from .denet import DeNet
+# from .denet import DeNet
 
 """Define commonly used architecture"""
 def qrnn3d():

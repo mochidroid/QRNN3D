@@ -1,6 +1,7 @@
 import numpy as np
 import torch
-from skimage.measure import compare_ssim, compare_psnr
+from skimage.metrics import structural_similarity as compare_ssim
+from skimage.metrics import peak_signal_noise_ratio as compare_psnr
 from functools import partial
 
 
@@ -19,7 +20,7 @@ class Bandwise(object):
         return bwindex
 
 
-cal_bwssim = Bandwise(compare_ssim)
+cal_bwssim = Bandwise(partial(compare_ssim, data_range=1))
 cal_bwpsnr = Bandwise(partial(compare_psnr, data_range=1))
 
 

@@ -1,8 +1,11 @@
 .vscode
 *.pyc
-*.pth
 __pycache__
-result
+result/
+results/
+dataset/
+datasets/
+qrnn3d_env/
 runs
 .ssh*
 .rsyncignore
