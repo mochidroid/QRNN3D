@@ -22,8 +22,8 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description='Run QRNN3D inference')
-    parser.add_argument('--input_path', type=str, default='dataset/normalized/JasperRidge/Case1/data.mat', help='Path to the input data.mat file')
-    parser.add_argument('--output_dir', type=str, default='result/normalized/JasperRidge/Case1', help='Directory to save the restored results')
+    parser.add_argument('--input_path', type=str, default='dataset/JasperRidge/Case1/data.mat', help='Path to the input data.mat file')
+    parser.add_argument('--output_dir', type=str, default='result/JasperRidge/Case1', help='Directory to save the restored results')
     parser.add_argument('--model_type', type=str, default='complex', choices=['gauss', 'complex', 'paviaft'], help='Type of model to use')
     parser.add_argument('--norm', type=str, default='clipped', choices=['minmax', 'clipped', 'raw'], help='Normalization method: minmax (scale 0-1), clipped (clamp 0-1), or raw (none)')
     args = parser.parse_args()
